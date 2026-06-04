@@ -1,0 +1,2415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch 2 Notes - Chef Gulshan Ara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js">
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --dark: #2C3E50;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --danger: #e74c3c;
+            --note-accent: #f39c12;
+            --note-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #fda085 100%);
+            --note-card-bg: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            --purple-soft: #8e44ad;
+            --teal: #1abc9c;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .email-login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+            animation: fadeInOverlay 0.5s ease;
+        }
+        .email-login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.5s ease;
+            text-align: center;
+        }
+        .email-login-card .login-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        .email-login-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        .email-login-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        .email-login-card input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        .email-login-card input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .email-login-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .email-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .email-error {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .email-error.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .logo i {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1.2rem 0.8rem 2.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            pointer-events: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-link,
+        .admin-link,
+        .logout-btn {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--dark);
+            border: none;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+        .nav-link.notes-active {
+            background: var(--purple-soft);
+            color: white;
+        }
+        .admin-link {
+            background: var(--gradient);
+            color: white;
+        }
+        .admin-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background: var(--dark);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.3s ease;
+        }
+        .dropbtn:hover {
+            background: #1a252f;
+        }
+        .dropbtn.topics-btn {
+            background: var(--purple-soft);
+        }
+        .dropbtn.topics-btn:hover {
+            background: #6c3483;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            z-index: 10;
+            overflow: hidden;
+            top: 100%;
+            left: 0;
+        }
+        .dropdown-content a {
+            color: var(--dark);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .dropdown-content a:hover {
+            background: #f0f0f0;
+            padding-left: 20px;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .hero {
+            background: var(--gradient);
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+            pointer-events: none;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        .chef-name {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+        .tagline {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-style: italic;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section-label {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--dark);
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .section-label i {
+            color: var(--purple-soft);
+        }
+        .section-label.recipe-label i {
+            color: var(--primary);
+        }
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .recipe-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: fadeInUp 0.6s ease;
+        }
+        .recipe-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        .recipe-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+        .recipe-card:hover .recipe-image {
+            transform: scale(1.05);
+        }
+        .recipe-info {
+            padding: 1.5rem;
+        }
+        .recipe-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        .recipe-cuisine {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Note Card Styles */
+        .note-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: fadeInUp 0.6s ease;
+            border-left: 5px solid var(--purple-soft);
+            display: flex;
+            flex-direction: column;
+            min-height: 220px;
+        }
+        .note-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(142, 68, 173, 0.2);
+            border-left-color: var(--note-accent);
+        }
+        .note-card-header {
+            background: linear-gradient(135deg, #f8f4ff 0%, #fef9f0 100%);
+            padding: 1.5rem 1.5rem 0.8rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+        .note-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--note-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+        .note-card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--dark);
+            line-height: 1.3;
+            flex: 1;
+        }
+        .note-card-body {
+            padding: 0.8rem 1.5rem 1.5rem;
+            flex: 1;
+        }
+        .note-card-preview {
+            color: #777;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .note-card-badge {
+            display: inline-block;
+            background: var(--purple-soft);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 0.8rem;
+        }
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #999;
+        }
+        .no-results i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #ddd;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            overflow-y: auto;
+            animation: fadeInOverlay 0.3s ease;
+        }
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal-content {
+            background: white;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 900px;
+            width: 95%;
+            position: relative;
+            animation: slideUp 0.4s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .close-modal {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            background: #f0f0f0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: none;
+            line-height: 1;
+        }
+        .close-modal:hover {
+            color: white;
+            background: var(--danger);
+        }
+        .recipe-detail img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+        .recipe-detail h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+        .recipe-detail .meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .recipe-detail .meta span {
+            background: #f0f0f0;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .recipe-detail h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .recipe-detail .method-paragraph {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+        .note-detail-header {
+            background: linear-gradient(135deg, #f8f4ff 0%, #fef9f0 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-left: 6px solid var(--purple-soft);
+        }
+        .note-detail-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--dark);
+            margin: 0;
+        }
+        .note-detail-header .note-meta {
+            color: #999;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Rich Text Editor */
+        .rich-editor {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+        .editor-toolbar {
+            background: #f8f9fa;
+            padding: 0.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .toolbar-btn {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .toolbar-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .toolbar-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .toolbar-btn i {
+            font-size: 0.8rem;
+        }
+        .color-picker {
+            width: 30px;
+            height: 30px;
+            padding: 2px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .font-size-select {
+            padding: 0.4rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+        }
+        .editor-content {
+            min-height: 200px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            outline: none;
+            word-wrap: break-word;
+        }
+        #methodEditor:empty:before {
+            content: 'Type your instructions...';
+            color: #aaa;
+        }
+        #ingredientsEditor:empty:before {
+            content: 'Add ingredients...';
+            color: #aaa;
+        }
+        #notesContentEditor:empty:before {
+            content: 'Type your notes content here...';
+            color: #aaa;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            min-height: 100vh;
+            background: #f0f2f5;
+        }
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .sidebar-header i {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            width: 100%;
+            text-align: left;
+        }
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 25px;
+            text-align: center;
+        }
+        .nav-item.logout-item {
+            margin-top: auto;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .nav-item.logout-item:hover {
+            background: rgba(231, 76, 60, 0.6);
+            border-color: rgba(231, 76, 60, 0.8);
+        }
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background: #f0f2f5;
+            overflow-y: auto;
+        }
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .content-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .recipe-form,
+        .email-form,
+        .notes-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="number"],
+        .form-group input[type="password"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .image-upload {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .image-upload:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .image-preview i {
+            font-size: 3rem;
+            color: #999;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .image-preview p {
+            color: #999;
+        }
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+        }
+        .submit-btn,
+        .cancel-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+            margin-right: 1rem;
+        }
+        .submit-btn {
+            background: var(--gradient);
+            color: white;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .cancel-btn {
+            background: #95a5a6;
+            color: white;
+        }
+        .cancel-btn:hover {
+            background: #7f8c8d;
+        }
+        .recipe-list,
+        .email-list,
+        .notes-list {
+            display: grid;
+            gap: 1rem;
+        }
+        .recipe-item,
+        .email-item,
+        .note-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .note-item {
+            border-left: 5px solid var(--purple-soft);
+        }
+        .btn-edit {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #f39c12;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+        }
+        .btn-edit:hover {
+            background: #e67e22;
+        }
+        .btn-delete {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: var(--danger);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 6000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        .notification.success {
+            background: #2ecc71;
+        }
+        .notification.error {
+            background: #e74c3c;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .back-btn {
+            background: var(--dark);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Login Modal */
+        .login-modal {
+            display: none;
+            position: fixed;
+            z-index: 2500;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            justify-content: center;
+            align-items: center;
+            animation: fadeInOverlay 0.3s ease;
+        }
+        .login-modal.show {
+            display: flex;
+        }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+            position: relative;
+        }
+        .login-card .login-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        .login-card h3 {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+        .login-card .login-subtitle {
+            text-align: center;
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 1.8rem;
+        }
+        .login-card .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .login-card .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .login-card .form-group .input-wrapper {
+            position: relative;
+        }
+        .login-card .form-group .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 1rem;
+        }
+        .login-card .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .login-card .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .login-error {
+            color: #e74c3c;
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 0.8rem;
+            display: none;
+            font-weight: 500;
+        }
+        .login-error.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-8px);
+            }
+            50% {
+                transform: translateX(8px);
+            }
+            75% {
+                transform: translateX(-5px);
+            }
+        }
+        .login-close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #999;
+            background: #f0f0f0;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: none;
+            line-height: 1;
+        }
+        .login-close:hover {
+            color: white;
+            background: var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+            .chef-name {
+                font-size: 3rem;
+            }
+            .recipe-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            .admin-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 1.5rem 1rem;
+            }
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .nav-item {
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+                padding: 0.7rem;
+                font-size: 0.85rem;
+            }
+            .login-card,
+            .email-login-card {
+                margin: 1rem;
+                padding: 2rem 1.5rem;
+            }
+            .modal-content {
+                margin: 1rem auto;
+                padding: 1.5rem;
+                width: 98%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Email Login Screen -->
+    <div class="email-login-screen" id="emailLoginScreen">
+        <div class="email-login-card">
+            <div class="login-icon">
+                <i class="fas fa-utensils"></i>
+            </div>
+            <h2>Chef Gulshan Ara</h2>
+            <p>Enter your email to view the recipe book</p>
+            <input type="email" id="emailInput" placeholder="your@email.com" required>
+            <button class="email-login-btn" onclick="loginWithEmail()">
+                <i class="fas fa-arrow-right"></i> Enter
+            </button>
+            <div class="email-error" id="emailError">Email not authorized. Please contact the admin.</div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" style="display: none;">
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <span>Batch 2 Notes</span>
+            </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search notes & recipes..." class="search-input">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" id="allNotesBtn" onclick="showAllContent(); return false;">
+                    <i class="fas fa-th-large"></i> All Notes
+                </a>
+                <div class="dropdown">
+                    <button class="dropbtn">Cuisines <i class="fas fa-chevron-down"></i></button>
+                    <div class="dropdown-content" id="cuisineDropdown"></div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropbtn topics-btn">Topics <i class="fas fa-chevron-down"></i></button>
+                    <div class="dropdown-content" id="topicsDropdown">
+                        <a href="#" style="color:#999;font-style:italic;">No topics yet</a>
+                    </div>
+                </div>
+                <button class="admin-link" onclick="handleAdminAccess()">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+                <button class="logout-btn" id="userLogoutBtn" style="display: none;" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="chef-name">Chef Gulshan Ara</h1>
+                <p class="tagline" </p>
+            </div>
+        </header>
+
+        <main class="container">
+            <!-- Notes Section -->
+            <div id="notesSection" style="display:none;">
+                <div class="section-label">
+                    <i class="fas fa-sticky-note"></i> Topics & Notes
+                </div>
+                <div class="recipe-grid" id="notesGrid"></div>
+            </div>
+            <!-- Recipes Section -->
+            <div id="recipesSection" style="display:none;">
+                <div class="section-label recipe-label">
+                    <i class="fas fa-utensils"></i> Recipes
+                </div>
+                <div class="recipe-grid" id="recipeGrid"></div>
+            </div>
+            <div class="no-results" id="noResults" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>No results found</h3>
+                <p>Try adjusting your search criteria</p>
+            </div>
+        </main>
+
+        <!-- Recipe/Note Detail Modal -->
+        <div class="modal" id="recipeModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <div class="recipe-detail" id="recipeDetail"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-card">
+            <button class="login-close" onclick="closeLoginModal()">&times;</button>
+            <div class="login-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h3>Admin Login</h3>
+            <p class="login-subtitle">Enter credentials to access the admin panel</p>
+            <form id="loginForm" onsubmit="authenticateAdmin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="loginUsername" placeholder="Enter username" required autocomplete="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Enter password" required autocomplete="current-password">
+                    </div>
+                </div>
+                <p class="login-error" id="loginError">Invalid username or password. Please try again.</p>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-container">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <i class="fas fa-utensils"></i>
+                    <h2>Batch 2 Notes</h2>
+                    <p>Admin Panel</p>
+                </div>
+                <nav class="sidebar-nav">
+                    <button class="nav-item" onclick="showAdminSection('add-recipe')">
+                        <i class="fas fa-plus-circle"></i> Add Recipe
+                    </button>
+                    <button class="nav-item" onclick="showAdminSection('manage-recipes')">
+                        <i class="fas fa-list"></i> Manage Recipes
+                    </button>
+                    <button class="nav-item" onclick="showAdminSection('add-note')">
+                        <i class="fas fa-sticky-note"></i> Add Note / Topic
+                    </button>
+                    <button class="nav-item" onclick="showAdminSection('manage-notes')">
+                        <i class="fas fa-clipboard-list"></i> Manage Notes
+                    </button>
+                    <button class="nav-item" onclick="showAdminSection('manage-emails')">
+                        <i class="fas fa-envelope"></i> Manage Emails
+                    </button>
+                    <button class="nav-item" onclick="showMainApp()">
+                        <i class="fas fa-book"></i> View Chef Book
+                    </button>
+                    <button class="nav-item logout-item" onclick="logoutAdmin()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </nav>
+            </aside>
+
+            <main class="main-content">
+                <!-- Add Recipe -->
+                <section id="add-recipe" class="content-section active">
+                    <h2 id="formTitle">Add New Recipe</h2>
+                    <form id="recipeForm" class="recipe-form">
+                        <input type="hidden" id="editRecipeId" value="">
+                        <div class="form-group">
+                            <label>Recipe Name *</label>
+                            <input type="text" id="recipeName" required placeholder="Enter recipe name">
+                        </div>
+                        <div class="form-group">
+                            <label>Cuisine Type *</label>
+                            <select id="cuisineType" required>
+                                <option value="">Select Cuisine</option>
+                                <option value="Pakistani">Pakistani</option>
+                                <option value="Italian">Italian</option>
+                                <option value="Chinese">Chinese</option>
+                                <option value="Indian">Indian</option>
+                                <option value="Mexican">Mexican</option>
+                                <option value="Thai">Thai</option>
+                                <option value="American">American</option>
+                                <option value="Mediterranean">Mediterranean</option>
+                                <option value="Japanese">Japanese</option>
+                                <option value="French">French</option>
+                                <option value="Continental">Continental</option>
+                                <option value="Fast Food">Fast Food</option>
+                                <option value="Sauce">Sauce</option>
+                                <option value="Soups">Soups</option>
+                                <option value="Drinks">Drinks</option>
+                                <option value="Baking Item">Baking Item</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Preparation Time</label>
+                            <input type="text" id="prepTime" placeholder="e.g., 30 minutes">
+                        </div>
+                        <div class="form-group">
+                            <label>Cooking Time</label>
+                            <input type="text" id="cookTime" placeholder="e.g., 45 minutes">
+                        </div>
+                        <div class="form-group">
+                            <label>Servings</label>
+                            <input type="number" id="servings" placeholder="Number of servings" min="1" value="4">
+                        </div>
+                        <div class="form-group">
+                            <label>Recipe Image *</label>
+                            <div class="image-upload" onclick="document.getElementById('recipeImage').click()">
+                                <input type="file" id="recipeImage" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                                <div class="image-preview" id="imagePreview">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Click to upload image</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Ingredients *</label>
+                            <div class="rich-editor">
+                                <div class="editor-toolbar">
+                                    <button type="button" class="toolbar-btn" onclick="formatIngredientsDoc('bold')" title="Bold"><i class="fas fa-bold"></i></button>
+                                    <select class="font-size-select" onchange="formatIngredientsDoc('fontSize', this.value)" title="Font Size">
+                                        <option value="1">Very Small</option>
+                                        <option value="2">Small</option>
+                                        <option value="3" selected>Normal</option>
+                                        <option value="4">Large</option>
+                                        <option value="5">Very Large</option>
+                                        <option value="6">Huge</option>
+                                        <option value="7">Massive</option>
+                                    </select>
+                                    <input type="color" class="color-picker" onchange="formatIngredientsDoc('foreColor', this.value)" title="Text Color" value="#000000">
+                                    <button type="button" class="toolbar-btn" onclick="formatIngredientsDoc('removeFormat')" title="Clear Formatting"><i class="fas fa-remove-format"></i></button>
+                                </div>
+                                <div id="ingredientsEditor" class="editor-content" contenteditable="true"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Method / Instructions *</label>
+                            <div class="rich-editor">
+                                <div class="editor-toolbar">
+                                    <button type="button" class="toolbar-btn" onclick="formatMethodDoc('bold')" title="Bold"><i class="fas fa-bold"></i></button>
+                                    <select class="font-size-select" onchange="formatMethodDoc('fontSize', this.value)" title="Font Size">
+                                        <option value="1">Very Small</option>
+                                        <option value="2">Small</option>
+                                        <option value="3" selected>Normal</option>
+                                        <option value="4">Large</option>
+                                        <option value="5">Very Large</option>
+                                        <option value="6">Huge</option>
+                                        <option value="7">Massive</option>
+                                    </select>
+                                    <input type="color" class="color-picker" onchange="formatMethodDoc('foreColor', this.value)" title="Text Color" value="#000000">
+                                    <button type="button" class="toolbar-btn" onclick="formatMethodDoc('removeFormat')" title="Clear Formatting"><i class="fas fa-remove-format"></i></button>
+                                </div>
+                                <div id="methodEditor" class="editor-content" contenteditable="true"></div>
+                            </div>
+                            <small style="color: #666; display: block; margin-top: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> You can format text (bold, size, color) directly. Numbering and dots you add yourself.
+                            </small>
+                        </div>
+                        <div>
+                            <button type="submit" class="submit-btn" id="saveBtn">
+                                <i class="fas fa-save"></i> Save Recipe
+                            </button>
+                            <button type="button" class="cancel-btn" id="cancelEditBtn" style="display: none;" onclick="cancelEdit()">
+                                <i class="fas fa-times"></i> Cancel Edit
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Manage Recipes -->
+                <section id="manage-recipes" class="content-section">
+                    <h2>Manage Recipes</h2>
+                    <div class="recipe-list" id="recipeList"></div>
+                </section>
+
+                <!-- Add Note / Topic -->
+                <section id="add-note" class="content-section">
+                    <h2 id="noteFormTitle">Add New Note / Topic</h2>
+                    <form id="noteForm" class="notes-form" onsubmit="saveNote(event)">
+                        <input type="hidden" id="editNoteId" value="">
+                        <div class="form-group">
+                            <label>Topic Name *</label>
+                            <input type="text" id="noteTitle" required placeholder="Enter topic name (e.g., Baking Basics, Spice Guide)">
+                        </div>
+                        <div class="form-group">
+                            <label>Content / Notes *</label>
+                            <div class="rich-editor">
+                                <div class="editor-toolbar">
+                                    <button type="button" class="toolbar-btn" onclick="formatNotesContentDoc('bold')" title="Bold"><i class="fas fa-bold"></i></button>
+                                    <select class="font-size-select" onchange="formatNotesContentDoc('fontSize', this.value)" title="Font Size">
+                                        <option value="1">Very Small</option>
+                                        <option value="2">Small</option>
+                                        <option value="3" selected>Normal</option>
+                                        <option value="4">Large</option>
+                                        <option value="5">Very Large</option>
+                                        <option value="6">Huge</option>
+                                        <option value="7">Massive</option>
+                                    </select>
+                                    <input type="color" class="color-picker" onchange="formatNotesContentDoc('foreColor', this.value)" title="Text Color" value="#000000">
+                                    <button type="button" class="toolbar-btn" onclick="formatNotesContentDoc('removeFormat')" title="Clear Formatting"><i class="fas fa-remove-format"></i></button>
+                                </div>
+                                <div id="notesContentEditor" class="editor-content" contenteditable="true"></div>
+                            </div>
+                            <small style="color: #666; display: block; margin-top: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> Write your notes here. Use bold, colors, and font sizes to organize your content.
+                            </small>
+                        </div>
+                        <div>
+                            <button type="submit" class="submit-btn" id="saveNoteBtn">
+                                <i class="fas fa-save"></i> Save Note
+                            </button>
+                            <button type="button" class="cancel-btn" id="cancelNoteEditBtn" style="display: none;" onclick="cancelNoteEdit()">
+                                <i class="fas fa-times"></i> Cancel Edit
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Manage Notes -->
+                <section id="manage-notes" class="content-section">
+                    <h2>Manage Notes / Topics</h2>
+                    <div class="notes-list" id="notesList"></div>
+                </section>
+
+                <!-- Manage Emails -->
+                <section id="manage-emails" class="content-section">
+                    <h2>Manage Allowed Emails</h2>
+                    <div class="email-form" style="margin-bottom: 2rem;">
+                        <div class="form-group">
+                            <label>Add New Email</label>
+                            <div style="display: flex; gap: 1rem;">
+                                <input type="email" id="newEmail" placeholder="user@example.com" style="flex: 1;">
+                                <button class="submit-btn" onclick="addEmail()" style="margin: 0;">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="email-list" id="emailList"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // ==================== FIREBASE CONFIGURATION ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyArrzWxrv5d2njhseTMN1xSZSH28n6Vuf8",
+            authDomain: "new-recipe-book-58346.firebaseapp.com",
+            databaseURL: "https://new-recipe-book-58346-default-rtdb.firebaseio.com",
+            projectId: "new-recipe-book-58346",
+            storageBucket: "new-recipe-book-58346.firebasestorage.app",
+            messagingSenderId: "742565442619",
+            appId: "1:742565442619:web:f02008cbc4dc349319181e",
+            measurementId: "G-TPLQVL4XLZ"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const recipesRef = database.ref('recipes');
+        const notesRef = database.ref('notes');
+        const emailsRef = database.ref('allowedEmails');
+
+        // ==================== GLOBAL VARIABLES ====================
+        let recipes = [];
+        let notes = []; // { id, title, content, createdAt }
+        let allowedEmails = [];
+        let currentFilter = 'all';
+        let currentEditId = null;
+        let currentEditNoteId = null;
+
+        // Admin credentials
+        const ADMIN_USERNAME = 'chefgulshanara';
+        const ADMIN_PASSWORD = '78692';
+
+        // ==================== REAL-TIME DATA SYNC ====================
+        function startListening() {
+            // Recipes listener
+            recipesRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    recipes = Object.keys(data).map(key => ({
+                        id: key,
+                        ...data[key]
+                    }));
+                } else {
+                    recipes = [];
+                }
+                refreshMainView();
+                if (document.getElementById('adminPanel').style.display !== 'none') {
+                    loadRecipeList();
+                }
+            });
+
+            // Notes listener
+            notesRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    notes = Object.keys(data).map(key => ({
+                        id: key,
+                        ...data[key]
+                    }));
+                    // Sort by createdAt descending (newest first)
+                    notes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                } else {
+                    notes = [];
+                }
+                refreshMainView();
+                if (document.getElementById('adminPanel').style.display !== 'none') {
+                    loadNotesList();
+                }
+            });
+
+            // Allowed emails listener
+            emailsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    allowedEmails = Object.keys(data).map(key => ({
+                        id: key,
+                        email: data[key].email
+                    }));
+                } else {
+                    allowedEmails = [];
+                }
+                if (document.getElementById('adminPanel').style.display !== 'none') {
+                    loadEmailList();
+                }
+            });
+        }
+
+        function refreshMainView() {
+            if (document.getElementById('mainApp').style.display !== 'none') {
+                displayAllContent();
+                populateCuisineDropdown();
+                populateTopicsDropdown();
+            }
+        }
+
+        // ==================== SEED DEFAULT EMAIL ====================
+        function seedDefaultEmails() {
+            emailsRef.once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    database.ref('allowedEmails').push({ email: 'moizkhalid114@gmail.com' })
+                        .then(() => console.log('Default email seeded.'))
+                        .catch(e => console.error('Error seeding email:', e));
+                }
+            });
+        }
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            startListening();
+            seedDefaultEmails();
+
+            const userEmail = sessionStorage.getItem('userEmail');
+            if (userEmail) {
+                showMainAppAfterEmailLogin(userEmail);
+            } else {
+                document.getElementById('emailLoginScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('input', function(e) {
+                        const searchTerm = e.target.value.toLowerCase();
+                        let filteredRecipes = recipes;
+                        let filteredNotes = notes;
+
+                        if (currentFilter !== 'all') {
+                            filteredRecipes = filteredRecipes.filter(r => r.cuisine === currentFilter);
+                        }
+
+                        if (searchTerm) {
+                            filteredRecipes = filteredRecipes.filter(recipe =>
+                                recipe.name.toLowerCase().includes(searchTerm) ||
+                                recipe.cuisine.toLowerCase().includes(searchTerm) ||
+                                (recipe.ingredients && typeof recipe.ingredients === 'string' && recipe
+                                    .ingredients.toLowerCase().includes(searchTerm))
+                            );
+                            filteredNotes = filteredNotes.filter(note =>
+                                note.title.toLowerCase().includes(searchTerm) ||
+                                (note.content && typeof note.content === 'string' && note.content
+                                    .toLowerCase().includes(searchTerm))
+                            );
+                        }
+
+                        displayFilteredContent(filteredRecipes, filteredNotes);
+                    });
+                }
+
+                const recipeForm = document.getElementById('recipeForm');
+                if (recipeForm) {
+                    recipeForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        saveRecipe();
+                    });
+                }
+            });
+
+            checkAdminSession();
+        }
+
+        // ==================== EMAIL LOGIN ====================
+        function loginWithEmail() {
+            const emailInput = document.getElementById('emailInput');
+            const errorEl = document.getElementById('emailError');
+            const email = emailInput.value.trim().toLowerCase();
+
+            if (!email || !email.includes('@')) {
+                errorEl.textContent = 'Please enter a valid email address.';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            const isAllowed = allowedEmails.some(item => item.email.toLowerCase() === email);
+            if (isAllowed) {
+                sessionStorage.setItem('userEmail', email);
+                hideEmailLoginScreen();
+                showMainAppAfterEmailLogin(email);
+            } else {
+                errorEl.textContent = 'Email not authorized. Please contact the admin.';
+                errorEl.classList.add('show');
+                emailInput.focus();
+                setTimeout(() => errorEl.classList.remove('show'), 3000);
+            }
+        }
+
+        function hideEmailLoginScreen() {
+            document.getElementById('emailLoginScreen').style.display = 'none';
+        }
+
+        function showMainAppAfterEmailLogin(email) {
+            document.getElementById('emailLoginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            const logoutBtn = document.getElementById('userLogoutBtn');
+            if (logoutBtn) {
+                logoutBtn.style.display = 'inline-flex';
+                logoutBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> Logout (${email})`;
+            }
+        }
+
+        function logoutUser() {
+            sessionStorage.removeItem('userEmail');
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('emailLoginScreen').style.display = 'flex';
+            document.getElementById('emailInput').value = '';
+            document.getElementById('emailError').classList.remove('show');
+        }
+
+        // ==================== RECIPE STORAGE (Firebase) ====================
+        function saveRecipeToFirebase(recipe) {
+            if (recipe.id && currentEditId) {
+                const updates = {};
+                updates[recipe.id] = {
+                    name: recipe.name,
+                    cuisine: recipe.cuisine,
+                    prepTime: recipe.prepTime,
+                    cookTime: recipe.cookTime,
+                    servings: recipe.servings,
+                    image: recipe.image,
+                    ingredients: recipe.ingredients,
+                    method: recipe.method
+                };
+                return database.ref('recipes').update(updates);
+            } else {
+                const newRecipeKey = database.ref('recipes').push().key;
+                recipe.id = newRecipeKey;
+                return database.ref('recipes/' + newRecipeKey).set({
+                    name: recipe.name,
+                    cuisine: recipe.cuisine,
+                    prepTime: recipe.prepTime,
+                    cookTime: recipe.cookTime,
+                    servings: recipe.servings,
+                    image: recipe.image,
+                    ingredients: recipe.ingredients,
+                    method: recipe.method
+                });
+            }
+        }
+
+        function deleteRecipeFromFirebase(id) {
+            return database.ref('recipes/' + id).remove();
+        }
+
+        // ==================== NOTES STORAGE (Firebase) ====================
+        function saveNoteToFirebase(noteData) {
+            if (noteData.id && currentEditNoteId) {
+                const updates = {};
+                updates[noteData.id] = {
+                    title: noteData.title,
+                    content: noteData.content,
+                    createdAt: noteData.createdAt || Date.now()
+                };
+                return database.ref('notes').update(updates);
+            } else {
+                const newNoteKey = database.ref('notes').push().key;
+                noteData.id = newNoteKey;
+                return database.ref('notes/' + newNoteKey).set({
+                    title: noteData.title,
+                    content: noteData.content,
+                    createdAt: Date.now()
+                });
+            }
+        }
+
+        function deleteNoteFromFirebase(id) {
+            return database.ref('notes/' + id).remove();
+        }
+
+        // ==================== EMAIL MANAGEMENT (Firebase) ====================
+        function addEmail() {
+            const newEmail = document.getElementById('newEmail').value.trim().toLowerCase();
+            if (!newEmail || !newEmail.includes('@')) {
+                showNotification('Please enter a valid email address.', 'error');
+                return;
+            }
+            if (allowedEmails.some(item => item.email.toLowerCase() === newEmail)) {
+                showNotification('This email is already in the list.', 'error');
+                return;
+            }
+            database.ref('allowedEmails').push({ email: newEmail })
+                .then(() => {
+                    showNotification('Email added successfully!', 'success');
+                    document.getElementById('newEmail').value = '';
+                })
+                .catch(error => {
+                    showNotification('Error adding email: ' + error.message, 'error');
+                });
+        }
+
+        function deleteEmail(id) {
+            if (confirm('Are you sure you want to remove this email?')) {
+                database.ref('allowedEmails/' + id).remove()
+                    .then(() => showNotification('Email removed.', 'success'))
+                    .catch(error => showNotification('Error: ' + error.message, 'error'));
+            }
+        }
+
+        function loadEmailList() {
+            const list = document.getElementById('emailList');
+            if (!list) return;
+            if (allowedEmails.length === 0) {
+                list.innerHTML = '<p style="text-align:center;color:#999;padding:2rem;">No emails added yet.</p>';
+                return;
+            }
+            list.innerHTML = allowedEmails.map(item => `
+                <div class="email-item">
+                    <div>
+                        <i class="fas fa-envelope" style="margin-right: 0.5rem; color: #667eea;"></i>
+                        <strong>${item.email}</strong>
+                    </div>
+                    <button class="btn-delete" onclick="deleteEmail('${item.id}')">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // ==================== DISPLAY ALL CONTENT (Notes + Recipes) ====================
+        function displayAllContent() {
+            displayFilteredContent(recipes, notes);
+        }
+
+        function displayFilteredContent(filteredRecipes, filteredNotes) {
+            const notesSection = document.getElementById('notesSection');
+            const notesGrid = document.getElementById('notesGrid');
+            const recipesSection = document.getElementById('recipesSection');
+            const recipeGrid = document.getElementById('recipeGrid');
+            const noResults = document.getElementById('noResults');
+
+            const hasNotes = filteredNotes && filteredNotes.length > 0;
+            const hasRecipes = filteredRecipes && filteredRecipes.length > 0;
+
+            // Show/hide sections
+            notesSection.style.display = hasNotes ? 'block' : 'none';
+            recipesSection.style.display = hasRecipes ? 'block' : 'none';
+
+            // Populate notes grid
+            if (hasNotes) {
+                notesGrid.innerHTML = filteredNotes.map(note => {
+                    const previewText = stripHtml(note.content || '').substring(0, 120) +
+                        (stripHtml(note.content || '').length > 120 ? '...' : '');
+                    const dateStr = note.createdAt ? new Date(note.createdAt).toLocaleDateString(
+                    'en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+                    return `
+                    <div class="note-card" onclick="openNote('${note.id}')">
+                        <div class="note-card-header">
+                            <div class="note-card-icon">
+                                <i class="fas fa-sticky-note"></i>
+                            </div>
+                            <div class="note-card-title">${escapeHTML(note.title)}</div>
+                        </div>
+                        <div class="note-card-body">
+                            <p class="note-card-preview">${previewText || 'Click to view full note...'}</p>
+                            <span class="note-card-badge"><i class="fas fa-tag"></i> Topic</span>
+                            ${dateStr ? `<span style="font-size:0.8rem;color:#999;margin-left:0.5rem;">${dateStr}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                }).join('');
+            } else {
+                notesGrid.innerHTML = '';
+            }
+
+            // Populate recipes grid
+            if (hasRecipes) {
+                recipeGrid.innerHTML = filteredRecipes.map(recipe => `
+                    <div class="recipe-card" onclick="openRecipe('${recipe.id}')">
+                        <img src="${recipe.image}" alt="${recipe.name}" class="recipe-image" onerror="this.src='https://via.placeholder.com/500x300?text=Recipe+Image'">
+                        <div class="recipe-info">
+                            <h3 class="recipe-name">${recipe.name}</h3>
+                            <span class="recipe-cuisine">${recipe.cuisine}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                recipeGrid.innerHTML = '';
+            }
+
+            // Show no results if both are empty
+            if (!hasNotes && !hasRecipes) {
+                noResults.style.display = 'block';
+                notesSection.style.display = 'none';
+                recipesSection.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+            }
+        }
+
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ==================== NOTE DETAIL MODAL ====================
+        function openNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            const dateStr = note.createdAt ? new Date(note.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }) : '';
+
+            document.getElementById('recipeDetail').innerHTML = `
+                <div class="note-detail-header">
+                    <h2><i class="fas fa-sticky-note" style="color:var(--purple-soft);margin-right:0.5rem;"></i> ${escapeHTML(note.title)}</h2>
+                    <p class="note-meta"><i class="fas fa-calendar-alt"></i> ${dateStr || 'No date'}</p>
+                </div>
+                <div class="method-paragraph" style="padding:1rem;">${note.content || '<p>No content.</p>'}</div>
+            `;
+
+            document.getElementById('recipeModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ==================== RECIPE DETAIL MODAL ====================
+        function openRecipe(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            const methodHTML = recipe.method || '';
+            let ingredientsContent = recipe.ingredients;
+            if (Array.isArray(ingredientsContent)) {
+                ingredientsContent = ingredientsContent.map(item => `<p>${item}</p>`).join('');
+            } else if (!ingredientsContent) {
+                ingredientsContent = '';
+            }
+
+            document.getElementById('recipeDetail').innerHTML = `
+                <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='https://via.placeholder.com/800x400?text=Recipe+Image'">
+                <h2>${recipe.name}</h2>
+                <div class="meta">
+                    <span><i class="fas fa-flag"></i> ${recipe.cuisine}</span>
+                    <span><i class="fas fa-clock"></i> Prep: ${recipe.prepTime}</span>
+                    <span><i class="fas fa-fire"></i> Cook: ${recipe.cookTime}</span>
+                    <span><i class="fas fa-users"></i> Serves: ${recipe.servings}</span>
+                </div>
+                <h3>Ingredients</h3>
+                <div class="method-paragraph">${ingredientsContent}</div>
+                <h3>Method</h3>
+                <div class="method-paragraph">${methodHTML}</div>
+            `;
+
+            document.getElementById('recipeModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('recipeModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // ==================== SEARCH & FILTER ====================
+        function showAllContent() {
+            currentFilter = 'all';
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.getElementById('allNotesBtn').classList.add('active');
+            displayAllContent();
+        }
+
+        function filterByCuisine(cuisine) {
+            currentFilter = cuisine;
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const filteredRecipes = recipes.filter(r => r.cuisine === cuisine);
+            displayFilteredContent(filteredRecipes, notes);
+        }
+
+        function filterByTopic(noteId) {
+            currentFilter = 'topic';
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const filteredNotes = notes.filter(n => n.id === noteId);
+            displayFilteredContent([], filteredNotes);
+            // Also open the note
+            if (filteredNotes.length > 0) {
+                openNote(noteId);
+            }
+        }
+
+        function populateCuisineDropdown() {
+            const cuisines = [...new Set(recipes.map(r => r.cuisine))];
+            const dropdown = document.getElementById('cuisineDropdown');
+            if (dropdown) {
+                dropdown.innerHTML = cuisines.map(cuisine =>
+                    `<a href="#" onclick="filterByCuisine('${cuisine}'); return false;">${cuisine}</a>`
+                ).join('');
+            }
+        }
+
+        function populateTopicsDropdown() {
+            const dropdown = document.getElementById('topicsDropdown');
+            if (!dropdown) return;
+            if (notes.length === 0) {
+                dropdown.innerHTML =
+                '<a href="#" style="color:#999;font-style:italic;">No topics yet</a>';
+            } else {
+                dropdown.innerHTML = notes.map(note =>
+                    `<a href="#" onclick="filterByTopic('${note.id}'); return false;" title="${escapeHTML(note.title)}">
+                        <i class="fas fa-sticky-note" style="margin-right:0.4rem;color:var(--purple-soft);"></i> ${escapeHTML(note.title.substring(0, 35))}${note.title.length > 35 ? '...' : ''}
+                    </a>`
+                ).join('');
+            }
+        }
+
+        // ==================== ADMIN AUTHENTICATION ====================
+        function handleAdminAccess() {
+            if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+                showAdminPanel();
+            } else {
+                showLoginModal();
+            }
+        }
+
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                document.getElementById('loginUsername').focus();
+            }, 300);
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function authenticateAdmin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorEl = document.getElementById('loginError');
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                closeLoginModal();
+                showAdminPanel();
+                showNotification('Login successful! Welcome, Chef Gulshan Ara.', 'success');
+            } else {
+                errorEl.classList.add('show');
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('loginPassword').focus();
+                setTimeout(() => {
+                    errorEl.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('adminLoggedIn');
+            showMainApp();
+            showNotification('Logged out successfully.', 'success');
+        }
+
+        function checkAdminSession() {}
+
+        // ==================== ADMIN PANEL NAVIGATION ====================
+        function showAdminPanel() {
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('recipeModal').style.display = 'none';
+            document.getElementById('loginModal').classList.remove('show');
+            document.body.style.overflow = '';
+            cancelEdit();
+            cancelNoteEdit();
+            loadRecipeList();
+            loadNotesList();
+            loadEmailList();
+            showAdminSection('add-recipe');
+        }
+
+        function showMainApp() {
+            document.getElementById('adminPanel').style.display = 'none';
+            if (sessionStorage.getItem('userEmail')) {
+                document.getElementById('mainApp').style.display = 'block';
+            } else {
+                document.getElementById('emailLoginScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+            }
+            document.body.style.overflow = '';
+            refreshMainView();
+        }
+
+        function showAdminSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+            }
+            if (sectionId === 'manage-recipes') loadRecipeList();
+            if (sectionId === 'manage-notes') loadNotesList();
+            if (sectionId === 'manage-emails') loadEmailList();
+        }
+
+        // ==================== IMAGE PREVIEW ====================
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').innerHTML =
+                        `<img src="${e.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ==================== RICH TEXT EDITOR FUNCTIONS ====================
+        function formatMethodDoc(command, value = null) {
+            document.getElementById('methodEditor').focus();
+            if (command === 'fontSize') {
+                document.execCommand('fontSize', false, value);
+            } else if (command === 'foreColor') {
+                document.execCommand('foreColor', false, value);
+            } else {
+                document.execCommand(command, false, null);
+            }
+        }
+
+        function formatIngredientsDoc(command, value = null) {
+            document.getElementById('ingredientsEditor').focus();
+            if (command === 'fontSize') {
+                document.execCommand('fontSize', false, value);
+            } else if (command === 'foreColor') {
+                document.execCommand('foreColor', false, value);
+            } else {
+                document.execCommand(command, false, null);
+            }
+        }
+
+        function formatNotesContentDoc(command, value = null) {
+            document.getElementById('notesContentEditor').focus();
+            if (command === 'fontSize') {
+                document.execCommand('fontSize', false, value);
+            } else if (command === 'foreColor') {
+                document.execCommand('foreColor', false, value);
+            } else {
+                document.execCommand(command, false, null);
+            }
+        }
+
+        // ==================== RECIPE FORM HANDLING ====================
+        function saveRecipe() {
+            const ingredientsHTML = document.getElementById('ingredientsEditor').innerHTML.trim();
+            const methodHTML = document.getElementById('methodEditor').innerHTML.trim();
+            const imageSrc = document.querySelector('#imagePreview img')?.src ||
+                'https://via.placeholder.com/500x300?text=Recipe+Image';
+
+            const recipeData = {
+                id: document.getElementById('editRecipeId').value || null,
+                name: document.getElementById('recipeName').value.trim(),
+                cuisine: document.getElementById('cuisineType').value,
+                prepTime: document.getElementById('prepTime').value.trim() || 'N/A',
+                cookTime: document.getElementById('cookTime').value.trim() || 'N/A',
+                servings: parseInt(document.getElementById('servings').value) || 4,
+                image: imageSrc,
+                ingredients: ingredientsHTML || '',
+                method: methodHTML || '<p>No instructions provided.</p>'
+            };
+
+            if (!recipeData.name || !recipeData.cuisine || !recipeData.image || !ingredientsHTML || !methodHTML) {
+                showNotification('Please fill all required fields.', 'error');
+                return;
+            }
+
+            saveRecipeToFirebase(recipeData)
+                .then(() => {
+                    showNotification(currentEditId ? 'Recipe updated successfully! 🎉' :
+                        'Recipe saved successfully! 🎉', 'success');
+                    resetForm();
+                    showAdminSection('add-recipe');
+                })
+                .catch(error => {
+                    showNotification('Error saving recipe: ' + error.message, 'error');
+                });
+        }
+
+        function resetForm() {
+            document.getElementById('recipeForm').reset();
+            document.getElementById('imagePreview').innerHTML =
+                '<i class="fas fa-cloud-upload-alt"></i><p>Click to upload image</p>';
+            document.getElementById('methodEditor').innerHTML = '';
+            document.getElementById('ingredientsEditor').innerHTML = '';
+            document.getElementById('editRecipeId').value = '';
+            currentEditId = null;
+            document.getElementById('formTitle').textContent = 'Add New Recipe';
+            document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save"></i> Save Recipe';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        function cancelEdit() {
+            resetForm();
+            showAdminSection('add-recipe');
+        }
+
+        // ==================== MANAGE RECIPES ====================
+        function loadRecipeList() {
+            const list = document.getElementById('recipeList');
+            if (!list) return;
+
+            if (recipes.length === 0) {
+                list.innerHTML =
+                    '<p style="text-align:center;color:#999;padding:2rem;">No recipes added yet. Start by adding one!</p>';
+                return;
+            }
+
+            list.innerHTML = recipes.map(recipe => `
+                <div class="recipe-item">
+                    <div>
+                        <h3>${recipe.name}</h3>
+                        <p style="color:#666;">${recipe.cuisine} | Serves: ${recipe.servings}</p>
+                    </div>
+                    <div>
+                        <button class="btn-edit" onclick="editRecipe('${recipe.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn-delete" onclick="deleteRecipe('${recipe.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editRecipe(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            document.getElementById('editRecipeId').value = id;
+            document.getElementById('recipeName').value = recipe.name;
+            document.getElementById('cuisineType').value = recipe.cuisine;
+            document.getElementById('prepTime').value = recipe.prepTime;
+            document.getElementById('cookTime').value = recipe.cookTime;
+            document.getElementById('servings').value = recipe.servings;
+
+            let ingHTML = recipe.ingredients;
+            if (Array.isArray(ingHTML)) {
+                ingHTML = ingHTML.map(item => `<p>${item}</p>`).join('');
+            }
+            document.getElementById('ingredientsEditor').innerHTML = ingHTML || '';
+            document.getElementById('methodEditor').innerHTML = recipe.method || '';
+            document.getElementById('imagePreview').innerHTML = recipe.image ?
+                `<img src="${recipe.image}" alt="Preview">` :
+                '<i class="fas fa-cloud-upload-alt"></i><p>Click to upload image</p>';
+
+            document.getElementById('formTitle').textContent = 'Edit Recipe';
+            document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save"></i> Update Recipe';
+            document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+            currentEditId = id;
+
+            showAdminSection('add-recipe');
+        }
+
+        function deleteRecipe(id) {
+            const recipeToDelete = recipes.find(r => r.id === id);
+            if (!recipeToDelete) return;
+            if (confirm(`Are you sure you want to delete "${recipeToDelete.name}"? This action cannot be undone.`)) {
+                deleteRecipeFromFirebase(id)
+                    .then(() => {
+                        showNotification('Recipe deleted successfully.', 'success');
+                        if (currentEditId === id) cancelEdit();
+                    })
+                    .catch(error => {
+                        showNotification('Error deleting recipe: ' + error.message, 'error');
+                    });
+            }
+        }
+
+        // ==================== NOTES FORM HANDLING ====================
+        function saveNote(event) {
+            if (event) event.preventDefault();
+            const contentHTML = document.getElementById('notesContentEditor').innerHTML.trim();
+            const title = document.getElementById('noteTitle').value.trim();
+
+            if (!title) {
+                showNotification('Please enter a topic name.', 'error');
+                return;
+            }
+            if (!contentHTML) {
+                showNotification('Please add some content to your note.', 'error');
+                return;
+            }
+
+            const noteData = {
+                id: document.getElementById('editNoteId').value || null,
+                title: title,
+                content: contentHTML,
+                createdAt: currentEditNoteId ? (notes.find(n => n.id === currentEditNoteId)?.createdAt || Date
+                .now()) : Date.now()
+            };
+
+            saveNoteToFirebase(noteData)
+                .then(() => {
+                    showNotification(currentEditNoteId ? 'Note updated successfully! 📝' :
+                        'Note saved successfully! 📝', 'success');
+                    resetNoteForm();
+                    showAdminSection('add-note');
+                    loadNotesList();
+                })
+                .catch(error => {
+                    showNotification('Error saving note: ' + error.message, 'error');
+                });
+        }
+
+        function resetNoteForm() {
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('notesContentEditor').innerHTML = '';
+            document.getElementById('editNoteId').value = '';
+            currentEditNoteId = null;
+            document.getElementById('noteFormTitle').textContent = 'Add New Note / Topic';
+            document.getElementById('saveNoteBtn').innerHTML = '<i class="fas fa-save"></i> Save Note';
+            document.getElementById('cancelNoteEditBtn').style.display = 'none';
+        }
+
+        function cancelNoteEdit() {
+            resetNoteForm();
+            showAdminSection('add-note');
+        }
+
+        // ==================== MANAGE NOTES ====================
+        function loadNotesList() {
+            const list = document.getElementById('notesList');
+            if (!list) return;
+
+            if (notes.length === 0) {
+                list.innerHTML =
+                    '<p style="text-align:center;color:#999;padding:2rem;">No notes added yet. Start by adding a topic!</p>';
+                return;
+            }
+
+            list.innerHTML = notes.map(note => {
+                const dateStr = note.createdAt ? new Date(note.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) : 'No date';
+                const preview = stripHtml(note.content || '').substring(0, 80) + (stripHtml(note.content || '')
+                    .length > 80 ? '...' : '');
+                return `
+                <div class="note-item">
+                    <div>
+                        <h3><i class="fas fa-sticky-note" style="color:var(--purple-soft);margin-right:0.5rem;"></i> ${escapeHTML(note.title)}</h3>
+                        <p style="color:#666;font-size:0.9rem;">${preview}</p>
+                        <small style="color:#999;">${dateStr}</small>
+                    </div>
+                    <div>
+                        <button class="btn-edit" onclick="editNote('${note.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn-delete" onclick="deleteNote('${note.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function editNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            document.getElementById('editNoteId').value = id;
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('notesContentEditor').innerHTML = note.content || '';
+            document.getElementById('noteFormTitle').textContent = 'Edit Note / Topic';
+            document.getElementById('saveNoteBtn').innerHTML = '<i class="fas fa-save"></i> Update Note';
+            document.getElementById('cancelNoteEditBtn').style.display = 'inline-flex';
+            currentEditNoteId = id;
+
+            showAdminSection('add-note');
+        }
+
+        function deleteNote(id) {
+            const noteToDelete = notes.find(n => n.id === id);
+            if (!noteToDelete) return;
+            if (confirm(
+                `Are you sure you want to delete the note "${noteToDelete.title}"? This action cannot be undone.`)) {
+                deleteNoteFromFirebase(id)
+                    .then(() => {
+                        showNotification('Note deleted successfully.', 'success');
+                        if (currentEditNoteId === id) cancelNoteEdit();
+                        loadNotesList();
+                    })
+                    .catch(error => {
+                        showNotification('Error deleting note: ' + error.message, 'error');
+                    });
+            }
+        }
+
+        // ==================== NOTIFICATIONS ====================
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML =
+                `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                notification.style.transition = 'all 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('recipeModal')) {
+                closeModal();
+            }
+            if (event.target === document.getElementById('loginModal')) {
+                closeLoginModal();
+            }
+        };
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                if (document.getElementById('loginModal').classList.contains('show')) {
+                    closeLoginModal();
+                } else if (document.getElementById('recipeModal').style.display === 'block') {
+                    closeModal();
+                }
+            }
+        });
+
+        // ==================== INITIALIZE APP ====================
+        init();
+    </script>
+</body>
+</html>
